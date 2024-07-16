@@ -19,7 +19,7 @@ resource bastionPublicIpAddress 'Microsoft.Network/publicIPAddresses@2020-08-01'
   }
 }
 
-resource bastion 'Microsoft.Network/bastionHosts@2023-04-01' = {
+resource bastion 'Microsoft.Network/bastionHosts@2023-11-01' = {
   name: bastionName
   location: location
   tags: tagValues
