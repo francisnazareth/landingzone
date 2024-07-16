@@ -74,6 +74,7 @@ resource networkRG 'Microsoft.Resources/resourceGroups@2022-09-01' = {
   location: location
   tags: tagValues
 }
+
 module ddosProtectionPlan 'modules/ddos/ddos.bicep' = {
   name: 'ddosProtectionPlan'
   scope: networkRG
@@ -119,7 +120,8 @@ module bastion './modules/bastion/bastion.bicep' = {
     bastionName: bastionName
     bastionPublicIPName: bastionPublicIPName
     bastionSku: bastionSku
-    tagValues: tagValues
+    tagValues: tagValues   
+    availabilityZones: availabilityZones
   }
 }
 
