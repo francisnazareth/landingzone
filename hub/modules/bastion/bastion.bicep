@@ -29,6 +29,8 @@ resource bastion 'Microsoft.Network/bastionHosts@2023-04-01' = {
     name: bastionSku
   }
 
+  zones: availabilityZones
+
   properties: {
     disableCopyPaste: false
     enableFileCopy: true
