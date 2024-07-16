@@ -4,6 +4,7 @@ param bastionName string
 param bastionSubnetID string
 param bastionSku string
 param tagValues object
+param availabilityZones array = []
 
 //create a public IP address for the bastion
 resource bastionPublicIpAddress 'Microsoft.Network/publicIPAddresses@2020-08-01' = {
