@@ -17,6 +17,8 @@ resource bastionPublicIpAddress 'Microsoft.Network/publicIPAddresses@2020-08-01'
   properties: {
     publicIPAllocationMethod: 'Static'
   }
+
+  zones: availabilityZones
 }
 
 resource bastion 'Microsoft.Network/bastionHosts@2023-11-01' = {
