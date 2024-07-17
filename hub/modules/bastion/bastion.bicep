@@ -18,7 +18,7 @@ resource bastionPublicIpAddress 'Microsoft.Network/publicIPAddresses@2020-08-01'
     publicIPAllocationMethod: 'Static'
   }
 
-  zones: availabilityZones
+  // zones: availabilityZones
 }
 
 resource bastion 'Microsoft.Network/bastionHosts@2023-11-01' = {
@@ -32,7 +32,7 @@ resource bastion 'Microsoft.Network/bastionHosts@2023-11-01' = {
     name: bastionSku
   }
 
-  zones: availabilityZones
+ // zones: availabilityZones
 
   properties: {
     disableCopyPaste: false
