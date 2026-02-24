@@ -3,692 +3,1185 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Landing Zone Builder</title>
+    <title>Azure Landing Zone Builder</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <style>
-        input {
-            width: 250px;
+        :root {
+            --azure-blue: #0078d4;
+            --azure-dark: #002050;
+            --azure-light: #deecf9;
+            --azure-gradient: linear-gradient(135deg, #0078d4 0%, #002050 100%);
+            --card-shadow: 0 2px 12px rgba(0, 120, 212, 0.08);
+            --card-hover-shadow: 0 4px 20px rgba(0, 120, 212, 0.15);
         }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f4f6f9;
+            color: #323130;
+            padding-bottom: 4rem;
+        }
+
+        /* ---- Hero Banner ---- */
+        .hero {
+            background: var(--azure-gradient);
+            color: #fff;
+            padding: 2.5rem 0 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            right: -80px;
+            top: -80px;
+            width: 320px;
+            height: 320px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }
+        .hero h1 {
+            font-weight: 600;
+            font-size: 2rem;
+            letter-spacing: -0.5px;
+        }
+        .hero p {
+            opacity: 0.85;
+            font-size: 1.05rem;
+            margin-bottom: 0;
+        }
+        .hero .azure-icon {
+            font-size: 2.5rem;
+            margin-right: 0.75rem;
+            vertical-align: middle;
+        }
+
+        /* ---- Sidebar Nav ---- */
+        .sidebar-nav {
+            position: sticky;
+            top: 1rem;
+        }
+        .sidebar-nav .nav-link {
+            color: #605e5c;
+            font-size: 0.875rem;
+            padding: 0.4rem 1rem;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+            border-radius: 0;
+        }
+        .sidebar-nav .nav-link:hover,
+        .sidebar-nav .nav-link.active {
+            color: var(--azure-blue);
+            background: var(--azure-light);
+            border-left-color: var(--azure-blue);
+        }
+        .sidebar-nav .nav-link i {
+            width: 1.3rem;
+            text-align: center;
+            margin-right: 0.4rem;
+            font-size: 0.95rem;
+        }
+
+        /* ---- Cards ---- */
+        .config-card {
+            background: #fff;
+            border: 1px solid #e1dfdd;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.25rem;
+            transition: box-shadow 0.25s;
+        }
+        .config-card:hover {
+            box-shadow: var(--card-hover-shadow);
+        }
+        .config-card .card-header {
+            background: #fff;
+            border-bottom: 1px solid #edebe9;
+            padding: 0.85rem 1.25rem;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .config-card .card-header h5 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--azure-dark);
+            flex: 1;
+        }
+        .config-card .card-header .section-icon {
+            color: var(--azure-blue);
+            font-size: 1.15rem;
+        }
+        .config-card .card-header .collapse-indicator {
+            color: #a19f9d;
+            transition: transform 0.3s;
+            font-size: 0.9rem;
+        }
+        .config-card .card-header[aria-expanded="false"] .collapse-indicator {
+            transform: rotate(-90deg);
+        }
+        .config-card .card-body {
+            padding: 1.25rem;
+        }
+
+        /* ---- Form Controls ---- */
+        .form-label {
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: #323130;
+            margin-bottom: 0.25rem;
+        }
+        .form-hint {
+            font-size: 0.75rem;
+            color: #8a8886;
+            margin-top: 2px;
+        }
+        .form-control, .form-select {
+            border-radius: 6px;
+            border: 1px solid #c8c6c4;
+            font-size: 0.9rem;
+            padding: 0.45rem 0.75rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--azure-blue);
+            box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.15);
+        }
+
+        /* ---- Radio / Checkbox ---- */
+        .form-check-input:checked {
+            background-color: var(--azure-blue);
+            border-color: var(--azure-blue);
+        }
+
+        /* ---- Tags Table ---- */
+        .tags-table th {
+            background: var(--azure-light);
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--azure-dark);
+        }
+        .tags-table td { vertical-align: middle; }
+        .tags-table input[type="text"] {
+            border: 1px solid #c8c6c4;
+            border-radius: 6px;
+            padding: 0.35rem 0.6rem;
+            font-size: 0.875rem;
+            width: 100%;
+        }
+        .tags-table input[type="text"]:focus {
+            outline: none;
+            border-color: var(--azure-blue);
+            box-shadow: 0 0 0 3px rgba(0,120,212,0.12);
+        }
+
+        /* ---- Buttons ---- */
+        .btn-azure {
+            background: var(--azure-blue);
+            color: #fff;
+            border: none;
+            font-weight: 500;
+            border-radius: 6px;
+            padding: 0.4rem 1rem;
+            font-size: 0.875rem;
+            transition: background 0.2s;
+        }
+        .btn-azure:hover { background: #106ebe; color: #fff; }
+
+        .btn-outline-azure {
+            border: 1px solid var(--azure-blue);
+            color: var(--azure-blue);
+            background: transparent;
+            font-weight: 500;
+            border-radius: 6px;
+            padding: 0.4rem 1rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+        .btn-outline-azure:hover {
+            background: var(--azure-blue);
+            color: #fff;
+        }
+
+        .btn-danger-sm {
+            font-size: 0.8rem;
+            padding: 0.25rem 0.6rem;
+        }
+
+        /* ---- Output Panel ---- */
+        .output-panel {
+            background: #1e1e1e;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+        .output-panel .output-header {
+            background: #2d2d2d;
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .output-panel .output-header span {
+            color: #cccccc;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .output-panel textarea {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border: none;
+            width: 100%;
+            font-family: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            padding: 1rem 1.25rem;
+            resize: vertical;
+            min-height: 400px;
+        }
+        .output-panel textarea:focus {
+            outline: none;
+        }
+
+        /* Copy toast */
+        .copy-toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #107c10;
+            color: #fff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateY(8px);
+            transition: all 0.3s;
+            z-index: 1050;
+            pointer-events: none;
+        }
+        .copy-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ---- Availability Zones ---- */
+        .zone-checks {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 991.98px) {
+            .sidebar-nav { display: none; }
+            .hero h1 { font-size: 1.5rem; }
+        }
+
+        /* Smooth scroll */
+        html { scroll-behavior: smooth; }
     </style>
 </head>
 
 <body>
-    <div class="container">
 
-        <h1>Hub landing zone values</h1>
-
-        <h2>Key prefixes</h2><br />
-
-        <table class="table" width="700px" style="background: #e5e5fe">
-            <tr>
-                <td><label for="customerPrefix">Customer prefix</label></td>
-                <td style="width: 400px"><input type="text" name="customerPrefix" id="customerPrefix" placeholder="cust"
-                        value="cust" onChange="updateValues()" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="locationPrefix">Location prefix</label></td>
-                <td><input type="text" name="locationPrefix" id="locationPrefix" placeholder="qc" value="qc"
-                        onChange="updateValues()" class="form-control"></td>
-            </tr>
-
-            <tr>
-                <td><label for="envPrefix">Environment prefix</label></td>
-                <td><input type="text" name="envPrefix" id="envPrefix" placeholder="hub" value="hub"
-                        onChange="updateValues()" class="form-control"></td>
-            </tr>
-        </table>
-
-        <h2>Resource Group names</h2><br />
-        <table class="table" width="700px" style="background: #e5e5fe">
-            <tr>
-                <td><label for="hubBackupRG">Backup resource group name</label></td>
-                <td style="width: 400px"><input type="text" name="hub_backup_rg" id="hubBackupRG"
-                        placeholder="rg-backup-hub-qc-01" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="hubManagementRG">Management resource group name</label></td>
-                <td><input type="text" name="hub_network_rg" id="hubManagementRG" placeholder="rg-management-hub-qc-01"
-                        onChange="updateBicep()" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="hubMonitoringRG">Monitoring resource group name</label></td>
-                <td><input type="text" name="hub_network_rg" id="hubMonitoringRG" placeholder="rg-monitoring-hub-qc-01"
-                        onChange="updateBicep()" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="hubNetworkRG">Network & security resource group name</label></td>
-                <td><input type="text" name="hub_network_rg" id="hubNetworkRG" placeholder="rg-network-hub-qc-01"
-                        onChange="updateBicep()" class="form-control"></td>
-            </tr>
-        </table>
-
-        <h2>Hub virtual network address space settings</h2><br />
-        <table class="table" width="700px" style="background: #e5e5fe">
-            <tr>
-                <td><label for="hubVnetAddressSpace">Hub virtual network address space</label></td>
-                <td style="width: 400px"><input type="text" name="hubVnetAddressSpace" id="hubVnetAddressSpace"
-                        placeholder="10.0.0.0/23" value="10.0.0.0/23" onChange="updateVNETRange()" class="form-control">
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <label for="firewallSubnet">Azure Firewall Subnet address space</label><br />
-                    <div style="font-size:10px">Minimum value of /26 is required for Azure Firewall subnet address
-                        space.</div>
-                </td>
-                <td><input type="text" name="firewallSubnet" id="firewallSubnet" placeholder="10.0.0.0/26"
-                        value="10.0.0.0/26" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-            <tr>
-                <td>
-                    <label for="bastionSubnet">Azure Bastion service address space</label><br />
-                    <div style="font-size:10px">Minimum value of /26 is required for Bastion subnet address space.</div>
-                </td>
-                <td><input type="text" name="bastionSubnet" placeholder="10.0.0.64/26" id="bastionSubnet"
-                        value="10.0.0.64/26" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="vpnGatewaySubnet">Azure VPN Gateway address space</label></td>
-                <td><input type="text" name="vpnGatewaySubnet" id="vpnGatewaySubnet" placeholder="10.0.0.128/27"
-                        value="10.0.0.128/27" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-
-            <tr>
-                <td><label for="peSubnet"> Private Endpoint Subnet address space</label></td>
-                <td><input type="text" name="peSubnet" id="peSubnet" placeholder="10.0.0.160/28" value="10.0.0.160/28"
-                        onChange="updateBicep()" class="form-control"></td>
-            </tr>
-
-            <tr>
-                <td><label for="mgmtSubnet">Management subnet address space</label></td>
-                <td><input type="text" name="mgmtSubnet" id="mgmtSubnet" placeholder="10.0.0.176/28"
-                        value="10.0.0.176/28" onChange="updateBicep()" class="form-control">
-                </td>
-            </tr>
-            <tr>
-                <td><label for="sharedServicesSubnet"> Shared services subnet address space</label></td>
-                <td><input type="text" name="sharedSvcSubnet" id="sharedSvcSubnet" placeholder="10.0.0.192/28"
-                        value="10.0.0.192/28" onChange="updateBicep()" class="form-control">
-                </td>
-            </tr>
-
-            <tr>
-                <td><label for="appGwSubnet"> Azure Application Gateway address space</label></td>
-                <td><input type="text" name="appGwSubnet" id="appGwSubnet" placeholder="10.0.0.224/27"
-                        value="10.0.0.224/27" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-
-        </table>
-        <h2>Resource Names</h2>
-        <table class="table" width="700px" style="background: #e5e5fe">
-            <tr>
-                <td>
-                    <label for="hubVNet">Hub virtual network name </label>
-                </td>
-                <td style="width: 400px"><input type="text" name="hubVnet" id="hubVnet" placeholder="vnet-hub-qc-01"
-                        onChange="updateBicep()" class="form-control"></td>
-            </tr>
-
-            <tr>
-                <td><label for="peSubnetName">Application Gateway subnet name</label></td>
-                <td><input type="text" name="peSubnetName" id="peSubnetName" placeholder="snet-pe-01"
-                        onChange="updateBicep()" class="form-control"></td>
-            </tr>
-
-            <tr>
-                <td><label for="mgmtSubnetName">Management subnet name</label></td>
-                <td><input type="text" name="snet-mgmt" id="mgmtSubnetName" placeholder="snet-management-01"
-                        onChange="updateBicep()" class="form-control"></td>
-            </tr>
-
-            <tr>
-                <td><label for="sharedServicesSubnetName">Shared Services subnet name</label></td>
-                <td><input type="text" name="snet-shared-services" id="sharedSvcSubnetName"
-                        placeholder="snet-sharedservices-01" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-
-        </table>
-
-        <h2>Azure Bastion Service settings</h2>
-        <table class="table" width="700px" style="background: #e5e5fe">
-            <tr>
-                <td><label for="bastionServiceName">Bastion service name</label></td>
-                <td><input type="text" name="hub_bastion_service_name" id="bastionServiceName"
-                        placeholder="bastion-hub-qc-01" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="bastionPublicIP">Bastion public IP address name</label> </td>
-                <td style="width: 400px"><input type="text" name="bastion_public_ip" id="bastionPublicIP"
-                        placeholder="publicip-bastion-hub-qc-01" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="bastionSKU">Bastion SKU</label></td>
-                <td>
-                    <select name="bastion-sku" id="bastionSKU" onChange="updateBicep()" class="form-control">
-                        <option value="Basic">Basic</option>
-                        <option value="Standard" selected="selected">Standard</option>
-                    </select>
-                </td>
-            </tr>
-        </table>
-
-        <h2>Azure Firewall settings</h2>
-        <table class="table" width="700px" style="background: #e5e5fe">
-            <tr>
-                <td><label for="azureFirewall">Firewall name</label></td>
-                <td style="width: 400px"><input type="text" name="firewall-name" id="azureFirewall"
-                        placeholder="firewall-hub-qc-01" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="azureFirewallPublicIP">Firewall public IP name</label></td>
-                <td><input type="text" name="firewall-public-ip" id="azureFirewallPublicIP"
-                        placeholder="publicip-firewall-hub-qc-01" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="azureFirewallPolicy"> Azure firewall policy name</label></td>
-                <td><input type="text" name="firewall-policy" id="azureFirewallPolicy" placeholder="fwpolicy-hub-qc-01"
-                        onChange="updateBicep()" class="form-control"></td>
-            </tr>
-
-        </table>
-
-        <h2>Azure Application Gateway (WAF) settings</h2>
-        <table class="table" width="700px" style="background: #e5e5fe">
-            <tr>
-                <td><label for="appGwName">Application Gateway name</label></td>
-                <td style="width: 400px"><input type="text" name="appGwName" id="appGwName" placeholder="agw-hub-qc-01"
-                        onChange="updateBicep()" class="form-control"></td>
-            </tr>
-
-            <tr>
-                <td><label for="appGwSubnetName">Application Gateway subnet name</label></td>
-                <td><input type="text" name="snet-appgw" id="appGwSubnetName" placeholder="snet-agw-01"
-                        onChange="updateBicep()" class="form-control"></td>
-            </tr>
-
-            <tr>
-                <td><label for="appGwPublicIP">Application Gateway public IP name</label></td>
-                <td><input type="text" name="appGwPublicIP" id="appGwPublicIP" placeholder="publicip-agw-hub-qc-01"
-                        onChange="updateBicep()" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="wafPolicy">Application Gateway WAF policy name</label></td>
-                <td><input type="text" name="wafPolicy" id="wafPolicy" placeholder="wafpolicy-agw-hub-qc-01"
-                        onChange="updateBicep()" class="form-control"></td>
-            </tr>
-
-        </table>
-
-        <h2>Log Analytics Workspace Settings</h2>
-        <table class="table" width="700px" style="background: #e5e5fe">
-            <tr>
-                <td><label for="lawName">Log analytics workspace name</label></td>
-                <td style="width: 400px"><input type="text" name="log-analytics-workspace" id="lawName"
-                        placeholder="law-hub-qc-01" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="lawRetentionDays">Log analytics workspace retention days</label></td>
-                <td><input type="number" name="log-analytics-retention-days" id="lawRetentionDays" placeholder=30
-                        value="30" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-        </table>
-
-        <h2>DDOS Plan settings</h2>
-        <table class="table" width="700px" style="background: #e5e5fe">
-
-            <tr>
-                <td><label for="ddosPlan">DDOS protection plan name</td>
-                <td style="width: 400px"> <input type="text" name="ddos-plan" id="ddosPlan"
-                        placeholder="ddosplan-hub-qc-01" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-
-            <tr>
-                <td><label for="ddosPlanEnabled">Enable DDOS Plan</label></td>
-                <td>
-                    <label><input type="radio" name="ddosPlanEnabled" id="ddosPlanEnabled" value="true" checked
-                            onChange="updateBicep()" class="form-control" style="width: 150px" />
-                        Enabled<br /></label>
-                    <label><input type="radio" name="ddosPlanEnabled" id="ddosPlanEnabled" value="false"
-                            onChange="updateBicep()" class="form-control" style="width: 150px" />
-                        Disabled</label>
-                </td>
-            </tr>
-        </table>
-
-        <h2>Recovery Service Vault Settings</h2>
-        <table class="table" width="700px" style="background: #e5e5fe">
-            <tr>
-                <td><label for="recoveryServiceVault">Recovery Service Vault name</td>
-                <td style="width: 400px"> <input type="text" name="recoveryServiceVault" id="recoveryServiceVault"
-                        placeholder="rsv-cust-hub-qc-01" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-        </table>
-
-        <h2>Managed Identity (for Key vault access) settings</h2>
-        <table class="table" width="700px" style="background: #e5e5fe">
-            <tr>
-                <td><label for="managedIdentity">Managed Identity name</td>
-                <td style="width: 400px"> <input type="text" name="managedIdentity" id="managedIdentity"
-                        placeholder="mi-kvaccess-cust-hub-qc-01" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-        </table>
-
-        <h2>Key Vault settings</h2>
-        <table class="table" width="700px" style="background: #e5e5fe">
-            <tr>
-                <td><label for="keyVaultName">Key Vault name</td>
-                <td style="width: 400px"> <input type="text" name="keyVaultName" id="keyVaultName"
-                        placeholder="kv-cust-hub-qc-01" onChange="updateBicep()" class="form-control" /></td>
-            </tr>
-            <tr>
-                <td><label for="keyVaultTier">Key Vault tier</td>
-                <td style="width: 400px">
-                    <select name="keyVaultTier" id="keyVaultTier" onChange="updateBicep()" class="form-control">
-                        <option value="premium" default>premium</option>
-                        <option value="standard">standard</option>
-                    </select>
-                </td>
-            </tr>
-
-        </table>
-
-        <h2>VNET Gateway settings</h2>
-        <table class="table" width="700px" style="background: #e5e5fe">
-            <tr>
-                <td><label for="vpnGatewayName">VNET Gateway name</td>
-                <td style="width: 400px"> <input type="text" name="vpnGatewayName" id="vpnGatewayName"
-                        placeholder="vgw-cust-hub-qc-01" onChange="updateBicep()" class="form-control" /></td>
-            </tr>
-
-            <tr>
-                <td><label for="vpnGatewayIP">VNET Gateway Public IP</td>
-                <td style="width: 400px"> <input type="text" name="vpnGatewayIP" id="vpnGatewayIP"
-                        placeholder="publicip-vgw-cust-hub-qc-01" onChange="updateBicep()" class="form-control" /></td>
-            </tr>
-
-            <tr>
-                <td><label for="vpnGatewayTier">VPN Gateway tier</td>
-                <td style="width: 400px">
-                    <select name="vpnGatewayTier" id="vpnGatewayTier" onChange="updateBicep()" class="form-control">
-                        <option value="VpnGw2AZ" default>VpnGw2AZ</option>
-                        <option value="VpnGw1AZ">VpnGw1AZ</option>
-                    </select>
-                </td>
-            </tr>
-        </table>
-
-        <h2>Jump server settings</h2>
-        <table class="table" width="700px" style="background: #e5e5fe">
-            <tr>
-                <td><label for="jumpServerPrefix">Jump server name prefix</label></td>
-                <td style="width: 400px"><input type="text" name="jumpServerPrefix" id="jumpServerPrefix"
-                        placeholder="winvm" value="winvm" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="jumpServerSize">Jump server VM Size</label></td>
-                <td><input type="text" name="jump-server-size" id="jumpServerSize" placeholder="Standard_D2s_v3"
-                        value="Standard_D2s_v3" onChange="updateBicep()" class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="adminUser">Jump server admin user</label></td>
-                <td><input type="text" name="adminUser" id="adminUser" onChange="updateBicep()" class="form-control">
-                </td>
-            </tr>
-            <tr>
-                <td><label for="adminPassword">Jump server admin password</label></td>
-                <td><input type="text" name="adminPassword" id="adminPassword" onChange="updateBicep()"
-                        class="form-control"></td>
-            </tr>
-            <tr>
-                <td><label for="vmNSGName">Network Security Group name for VM (Jump server) Subnet</label></td>
-                <td><input type="text" name="vmNSGName" id="vmNSGName" onChange="updateBicep()" class="form-control">
-                </td>
-            </tr>
-
-            <tr>
-                <td><label for="vmRouteTableName">Route Table name for VM (Jump server) Subnet</label></td>
-                <td><input type="text" name="vmRouteTableName" id="vmRouteTableName" onChange="updateBicep()"
-                        class="form-control">
-                </td>
-            </tr>
-        </table>
-
-        <div id="tagValues" value=""></div>
-        <div id="availabilityZones" value=""></div>
-
-        <h2>Resource Tags</h2>
-        <table id="myTable" class="order-list" width="700px" style="background: #e5e5fe">
-            <thead>
-                <tr>
-                    <td>Tag Name</td>
-                    <td>Tag Value</td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <input type="text" name="key1" />
-                    </td>
-                    <td>
-                        <input type="text" name="value1" />
-                    </td>
-                    <td><a class="deleteRow"></a>
-                        <input type="button" class="ibtnDel"  value="Delete">
-                    </td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="5" style="text-align: left;">
-                        <input type="button" id="addrow" value="Add Tag" />
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
-
-        <script>
-            $(document).ready(function () {
-                var counter = 0;
-                $("#addrow").on("click", function () {
-                    counter = $('#myTable tr').length - 2;
-                    var newRow = $("<tr>");
-                    var cols = "";
-                    cols += '<td><input type="text" name="key' + counter + '"/></td>';
-                    cols += '<td><input type="text" name="value' + counter + '"/></td>';
-                    cols += '<td><input type="button" class="ibtnDel"  value="Delete"></td>';
-                    newRow.append(cols);
-                    if (counter == 5) 
-                        $('#addrow').attr('disabled', true).prop('value', "You've reached the limit");
-                    $("table.order-list").append(newRow);
-                    counter++;
-                });
-
-                $("table.order-list").on("change", 'input[name^="value"]', function (event) {
-                    calculateTags();                
-                });
-
-                $("table.order-list").on("click", ".ibtnDel", function (event) {
-                    $(this).closest("tr").remove();
-                    calculateTags();
-                    counter -= 1
-                    $('#addrow').attr('disabled', false).prop('value', "Add Tag");
-                });
-            });
-
-            function calculateTags() {
-                const keys = [];
-                const vals = []; 
-                $("table.order-list").find('input[name^="key"]').each(function () {
-                    keys.push($(this).val());
-                });
-                $("table.order-list").find('input[name^="value"]').each(function () {
-                    vals.push($(this).val());
-                });
-
-                var tagValues = "param tagValues = {" + "\r\n"  ;
-
-                keys.forEach((tagName, index) => {
-                    const tagValue = vals[index];
-                    console.log(tagName, tagValue);
-                    tagValues += "\t" +  tagName + ': ' + "'" + tagValue + "'"  + "\r\n" 
-                });
-
-                tagValues += "}"
-                document.getElementById("tagValues").value = tagValues; 
-                updateBicep();
-            }
-        </script>
-
-<h2>Availability Zones for  resources</h2>
-<table class="table" width="700px" style="background: #e5e5fe">
-    <tr>
-        <td><label for="availabilityZones">Availability Zones</td>
-        <td style="width: 400px">
-            <fieldset>
-            <input type="checkbox" id="zone1" name="availabilityZones" value=1 checked  onload="getCheckboxValues()" onChange="getCheckboxValues()">
-            <label for="zone1">Zone 1</label>
-            <input type="checkbox" id="zone2" name="availabilityZones" value=2 checked onChange="getCheckboxValues()">
-            <label for="zone2">Zone 2</label>
-            <input type="checkbox" id="zone3" name="availabilityZones" value=3 checked onChange="getCheckboxValues()">
-            <label for="zone3">Zone 3</label>
-            </fieldset>
-        </td>
-    </tr>
-</table>
-
-<script>
-    function getCheckboxValues() {
-        var checkBoxVals = [];
-
-        $("input:checkbox[name=availabilityZones]:checked").each(function(){
-            if( '1' === $(this).val())
-                checkBoxVals.push(1);
-            if ( '2' === $(this).val())
-                checkBoxVals.push(2);
-            if ( '3' === $(this).val())
-                checkBoxVals.push(3);
-        });
-        console.log("param availabilityZones = [" + checkBoxVals + "]");
-        document.getElementById("availabilityZones").value = "param availabilityZones = [" + checkBoxVals + "]";
-        updateBicep();
-    }
-</script>
-       
-
-        <div height="50px"></div>
-        <h1>Bicep parameter file</h1>
-        <table width="700px">
-            <tr>
-                <td width="100%"">
-                <textarea rows=60 cols=80 id="bicepTextArea"></textarea>
-                </td>
-            </tr>
-        </table>
-        <script>
-
-            function updateVNETRange() {
-                var addressPrefix = document.getElementById("hubVnetAddressSpace").value;
-                const ipArray = addressPrefix.split(".", 3);
-                var firstThreeParts = ipArray[0] + "." + ipArray[1] + "." + ipArray[2] + ".";
-                var firewallSubnet = firstThreeParts + "0/26";
-                document.getElementById("firewallSubnet").value = firewallSubnet;
-                var bastionSubnet = firstThreeParts + "64/26";
-                document.getElementById("bastionSubnet").value = bastionSubnet;
-                var vpnGatewaySubnet = firstThreeParts + "128/27";
-                document.getElementById("vpnGatewaySubnet").value = vpnGatewaySubnet;
-                var peSubnet = firstThreeParts + "160/28";
-                document.getElementById("peSubnet").value = peSubnet;
-                var mgmtSubnet = firstThreeParts + "176/28";
-                document.getElementById("mgmtSubnet").value = mgmtSubnet;
-                var sharedSvcSubnet = firstThreeParts + "192/28";
-                document.getElementById("sharedSvcSubnet").value = sharedSvcSubnet;
-                var appGwSubnet = firstThreeParts + "224/27";
-                document.getElementById("appGwSubnet").value = appGwSubnet;
-                updateBicep();
-            }
-
-            function updateValues() {
-                document.getElementById("hubBackupRG").value = createString('rg-backup');
-                document.getElementById("hubManagementRG").value = createString('rg-management');
-                document.getElementById("hubMonitoringRG").value = createString('rg-monitoring');
-                document.getElementById("hubNetworkRG").value = createString('rg-network');
-                document.getElementById("bastionServiceName").value = createString('bastion');
-                document.getElementById("hubVnet").value = createString('vnet');
-                document.getElementById("bastionPublicIP").value = createString('publicip-bastion');
-                document.getElementById("appGwSubnetName").value = createString('snet-agw');
-                document.getElementById("appGwName").value = createString('agw');
-                document.getElementById("appGwPublicIP").value = createString('publicip-agw');
-                document.getElementById("wafPolicy").value = createString('wafpolicy-agw');
-                document.getElementById("mgmtSubnetName").value = createString('snet-management');
-                document.getElementById("sharedSvcSubnetName").value = createString('snet-sharedservices');
-                document.getElementById("peSubnetName").value = createString('snet-pe');
-                document.getElementById("azureFirewall").value = createString('firewall');
-                document.getElementById("azureFirewallPublicIP").value = createString('publicip-firewall');
-                document.getElementById("azureFirewallPolicy").value = createString('fwpolicy');
-                document.getElementById("lawName").value = createString('law');
-                document.getElementById("ddosPlan").value = createString('ddosplan');
-                document.getElementById("vmNSGName").value = createString('nsg-jumpserver');
-                document.getElementById("vmRouteTableName").value = createString('rt-jumpserver');
-                document.getElementById("recoveryServiceVault").value = createString('vault');
-                document.getElementById("managedIdentity").value = createString('mi-kvaccess');
-                document.getElementById("keyVaultName").value = createString('kv');
-                document.getElementById("vpnGatewayName").value = createString('vgw');
-                document.getElementById("vpnGatewayIP").value = createString('publicip-vgw');
-                updateBicep();
-            }
-
-            function createString(resourceType) {
-                var customerPrefixVal = document.getElementById("customerPrefix").value;
-                var locationPrefixVal = document.getElementById("locationPrefix").value;
-
-                var envPrefixVal = document.getElementById("envPrefix").value;
-
-                if (customerPrefixVal == null || customerPrefixVal == "") {
-                    customerPrefixVal = "-";
-                } else {
-                    customerPrefixVal = "-" + customerPrefixVal + "-";
-                }
-
-                if (locationPrefixVal == null || locationPrefixVal == "") {
-                    locationPrefixVal = "-";
-                } else {
-                    locationPrefixVal = "-" + locationPrefixVal + "-";
-                }
-
-                return resourceType + customerPrefixVal + envPrefixVal + locationPrefixVal + "01";
-            }
-
-            function getBicepString(string1, var2) {
-                return "param " + string1 + " = '" + var2 + "'\r\n";
-            }
-
-            function getBicepNumber(string1, var2) {
-                return "param " + string1 + " = " + var2 + "\r\n";
-            }
-
-            function getBicepBool(string1, var2) {
-                return "param " + string1 + " = " + var2 + "\r\n";
-            }
-
-
-            function updateBicep() {
-                var hubBackupRG = document.getElementById("hubBackupRG").value;
-                var hubManagementRG = document.getElementById("hubManagementRG").value;
-                var hubMonitoringRG = document.getElementById("hubMonitoringRG").value;
-                var hubNetworkRG = document.getElementById("hubNetworkRG").value;
-
-                var hubVnetAddressSpace = document.getElementById("hubVnetAddressSpace").value;
-                var firewallSubnet = document.getElementById("firewallSubnet").value;
-                var bastionSubnet = document.getElementById("bastionSubnet").value;
-                var vpnGatewaySubnet = document.getElementById("vpnGatewaySubnet").value;
-                var peSubnet = document.getElementById("peSubnet").value;
-                var mgmtSubnet = document.getElementById("mgmtSubnet").value;
-                var sharedSvcSubnet = document.getElementById("sharedSvcSubnet").value;
-                var appGwSubnet = document.getElementById("appGwSubnet").value;
-
-                var vnetName = document.getElementById("hubVnet").value;
-                var firewallName = document.getElementById("azureFirewall").value;
-                var firewallPublicIPName = document.getElementById("azureFirewallPublicIP").value;
-                var azureFirewallPolicy = document.getElementById("azureFirewallPolicy").value;
-
-                var bastionServiceName = document.getElementById("bastionServiceName").value;
-                var bastionPublicIP = document.getElementById("bastionPublicIP").value;
-                var bastionSKU = document.getElementById("bastionSKU").value;
-                var peSubnetName = document.getElementById("peSubnetName").value;
-                var mgmtSubnetName = document.getElementById("mgmtSubnetName").value;
-                var sharedSvcSubnetName = document.getElementById("sharedSvcSubnetName").value;
-
-                var lawRetentionDays = document.getElementById("lawRetentionDays").value;
-                var lawName = document.getElementById("lawName").value;
-                var ddosPlan = document.getElementById("ddosPlan").value;
-                var ddosPlanEnabled = document.querySelector('input[name="ddosPlanEnabled"]:checked').value;
-
-                var appGwSubnetName = document.getElementById("appGwSubnetName").value;
-                var appGwName = document.getElementById("appGwName").value;
-                var appGwPublicIP = document.getElementById("appGwPublicIP").value;
-                var wafPolicy = document.getElementById("wafPolicy").value;
-
-                var recoveryServiceVault = document.getElementById("recoveryServiceVault").value;
-                var managedIdentity = document.getElementById("managedIdentity").value;
-
-                var keyVaultName = document.getElementById("keyVaultName").value;
-                var keyVaultTier = document.getElementById("keyVaultTier").value;
-
-                var vpnGatewayName = document.getElementById("vpnGatewayName").value;
-                var vpnGatewayIP = document.getElementById("vpnGatewayIP").value;
-                var vpnGatewayTier = document.getElementById("vpnGatewayTier").value;
-
-                var bicepTextArea = document.getElementById('bicepTextArea');
-
-                var jumpServerPrefix = document.getElementById("jumpServerPrefix").value;
-                var jumpServerSize = document.getElementById("jumpServerSize").value;
-                var adminUser = document.getElementById("adminUser").value; 
-                var adminPassword = document.getElementById("adminPassword").value;
-                var vmNSGName = document.getElementById("vmNSGName").value;
-                var vmRouteTableName = document.getElementById("vmRouteTableName").value;
-                var tagValues = document.getElementById("tagValues").value; 
-                if(tagValues == null) tagValues= "";
-                var availabilityZones = document.getElementById("availabilityZones").value; 
-                if (availabilityZones==null)
-                    availabilityZones = "param availabilityZones = [1,2,3]";
-                
-                console.log(tagValues); 
-
-                bicepTextArea.innerHTML =
-                    "using './main.bicep'" + "\r\n" +
-                    getBicepString("backupRGName", hubBackupRG) +
-                    getBicepString("managementRGName", hubManagementRG) +
-                    getBicepString("monitoringRGName", hubMonitoringRG) +
-                    getBicepString("networkRGName", hubNetworkRG) +
-                    getBicepString("vnetAddressPrefix", hubVnetAddressSpace) +
-                    getBicepString("fwSubnetAddressPrefix", firewallSubnet) +
-                    getBicepString("bastionSubnetAddressPrefix", bastionSubnet) +
-                    getBicepString("vpnSubnetAddressPrefix", vpnGatewaySubnet) +
-                    getBicepString("peSubnetAddressPrefix", peSubnet) +
-                    getBicepString("managementSubnetAddressPrefix", mgmtSubnet) +
-                    getBicepString("sharedServicesSubnetAddressPrefix", sharedSvcSubnet) +
-                    getBicepString("appGwSubnetAddressPrefix", appGwSubnet) +
-                    getBicepString("vnetName", vnetName) +
-                    getBicepString("firewallName", firewallName) +
-                    getBicepString("firewallPublicIPName", firewallPublicIPName) +
-                    getBicepString("firewallPolicyName", azureFirewallPolicy) +
-                    getBicepString("bastionName", bastionServiceName) +
-                    getBicepString("bastionPublicIPName", bastionPublicIP) +
-                    getBicepString("bastionSku", bastionSKU) +
-                    getBicepString("peSubnetName", peSubnetName) +
-                    getBicepString("managementSubnetName", mgmtSubnetName) +
-                    getBicepString("sharedServicesSubnetName", sharedSvcSubnetName) +
-                    getBicepNumber("logAnalyticsRetentionInDays", lawRetentionDays) +
-                    getBicepString("logAnalyticsWorkspaceName", lawName) +
-                    getBicepString("logAnalyticsSku", "PerGB2018") +
-                    getBicepString("ddosProtectionPlanName", ddosPlan) +
-                    getBicepBool("ddosProtectionPlanEnabled", ddosPlanEnabled) +
-                    getBicepString("appGwSubnetName", appGwSubnetName) +
-                    getBicepString("applicationGatewayName", appGwName) +
-                    getBicepString("applicationGatewayPublicIPName", appGwPublicIP) +
-                    getBicepString("appGatewayWAFPolicyName", wafPolicy) +
-                    getBicepString("recoveryServiceVaultName", recoveryServiceVault) +
-                    getBicepString("managedIdentityName", managedIdentity) +
-                    getBicepString("keyVaultName", keyVaultName) +
-                    getBicepString("keyVaultSKU", keyVaultTier) +
-                    getBicepString("vpnGatewayName", vpnGatewayName) +
-                    getBicepString("vpnGatewayPublicIP", vpnGatewayIP) +
-                    getBicepString("vpnGatewayTier", vpnGatewayTier) +
-                    getBicepString("vmName", jumpServerPrefix) + 
-                    getBicepString("vmSize", jumpServerSize) + 
-                    getBicepString("vmNSGName", vmNSGName) + 
-                    getBicepString("vmRouteTableName", vmRouteTableName) + 
-                    getBicepString("adminUsername", adminUser) + 
-                    getBicepString("adminPassword", adminPassword) + 
-                    tagValues + "\r\n"+
-                    availabilityZones + 
-                    "";
-            }
-        </script>
+    <!-- Hero Banner -->
+    <div class="hero">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-cloud-fill azure-icon"></i>
+                <div>
+                    <h1>Azure Landing Zone Builder</h1>
+                    <p>Generate Bicep parameter files for your Hub landing zone deployment</p>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <div class="container">
+        <div class="row">
+
+            <!-- Sidebar Navigation -->
+            <div class="col-lg-3 d-none d-lg-block">
+                <nav class="sidebar-nav">
+                    <a class="nav-link active" href="#prefixes"><i class="bi bi-tag"></i> Key Prefixes</a>
+                    <a class="nav-link" href="#resourceGroups"><i class="bi bi-folder"></i> Resource Groups</a>
+                    <a class="nav-link" href="#vnet"><i class="bi bi-diagram-3"></i> Virtual Network</a>
+                    <a class="nav-link" href="#resourceNames"><i class="bi bi-card-text"></i> Resource Names</a>
+                    <a class="nav-link" href="#bastion"><i class="bi bi-shield-lock"></i> Bastion</a>
+                    <a class="nav-link" href="#firewall"><i class="bi bi-fire"></i> Firewall</a>
+                    <a class="nav-link" href="#appGw"><i class="bi bi-globe"></i> App Gateway</a>
+                    <a class="nav-link" href="#logAnalytics"><i class="bi bi-graph-up"></i> Log Analytics</a>
+                    <a class="nav-link" href="#ddos"><i class="bi bi-shield-check"></i> DDoS Protection</a>
+                    <a class="nav-link" href="#rsv"><i class="bi bi-safe"></i> Recovery Vault</a>
+                    <a class="nav-link" href="#identity"><i class="bi bi-person-badge"></i> Managed Identity</a>
+                    <a class="nav-link" href="#keyvault"><i class="bi bi-key"></i> Key Vault</a>
+                    <a class="nav-link" href="#vpnGw"><i class="bi bi-router"></i> VNet Gateway</a>
+                    <a class="nav-link" href="#jumpServer"><i class="bi bi-pc-display"></i> Jump Server</a>
+                    <a class="nav-link" href="#tags"><i class="bi bi-tags"></i> Tags</a>
+                    <a class="nav-link" href="#zones"><i class="bi bi-geo-alt"></i> Availability Zones</a>
+                    <a class="nav-link" href="#output"><i class="bi bi-file-earmark-code"></i> Output</a>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+
+                <!-- Key Prefixes -->
+                <div class="config-card" id="prefixes">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapsePrefixes" aria-expanded="true">
+                        <i class="bi bi-tag section-icon"></i>
+                        <h5>Key Prefixes</h5>
+                        <i class="bi bi-chevron-down collapse-indicator"></i>
+                    </div>
+                    <div class="collapse show" id="collapsePrefixes">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="customerPrefix" class="form-label">Customer prefix</label>
+                                    <input type="text" id="customerPrefix" placeholder="cust" value="cust"
+                                        onChange="updateValues()" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="locationPrefix" class="form-label">Location prefix</label>
+                                    <input type="text" id="locationPrefix" placeholder="qc" value="qc"
+                                        onChange="updateValues()" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="envPrefix" class="form-label">Environment prefix</label>
+                                    <input type="text" id="envPrefix" placeholder="hub" value="hub"
+                                        onChange="updateValues()" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resource Groups -->
+                <div class="config-card" id="resourceGroups">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseRG" aria-expanded="true">
+                        <i class="bi bi-folder section-icon"></i>
+                        <h5>Resource Group Names</h5>
+                        <i class="bi bi-chevron-down collapse-indicator"></i>
+                    </div>
+                    <div class="collapse show" id="collapseRG">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="hubBackupRG" class="form-label">Backup resource group</label>
+                                    <input type="text" id="hubBackupRG" placeholder="rg-backup-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="hubManagementRG" class="form-label">Management resource group</label>
+                                    <input type="text" id="hubManagementRG" placeholder="rg-management-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="hubMonitoringRG" class="form-label">Monitoring resource group</label>
+                                    <input type="text" id="hubMonitoringRG" placeholder="rg-monitoring-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="hubNetworkRG" class="form-label">Network &amp; security resource group</label>
+                                    <input type="text" id="hubNetworkRG" placeholder="rg-network-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Virtual Network -->
+                <div class="config-card" id="vnet">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseVnet" aria-expanded="true">
+                        <i class="bi bi-diagram-3 section-icon"></i>
+                        <h5>Hub Virtual Network Address Space</h5>
+                        <i class="bi bi-chevron-down collapse-indicator"></i>
+                    </div>
+                    <div class="collapse show" id="collapseVnet">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="hubVnetAddressSpace" class="form-label">Hub VNet address space</label>
+                                    <input type="text" id="hubVnetAddressSpace" placeholder="10.0.0.0/23"
+                                        value="10.0.0.0/23" onChange="updateVNETRange()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="firewallSubnet" class="form-label">Firewall subnet</label>
+                                    <input type="text" id="firewallSubnet" placeholder="10.0.0.0/26"
+                                        value="10.0.0.0/26" onChange="updateBicep()" class="form-control">
+                                    <div class="form-hint">Minimum /26 required</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="bastionSubnet" class="form-label">Bastion subnet</label>
+                                    <input type="text" id="bastionSubnet" placeholder="10.0.0.64/26"
+                                        value="10.0.0.64/26" onChange="updateBicep()" class="form-control">
+                                    <div class="form-hint">Minimum /26 required</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="vpnGatewaySubnet" class="form-label">VPN Gateway subnet</label>
+                                    <input type="text" id="vpnGatewaySubnet" placeholder="10.0.0.128/27"
+                                        value="10.0.0.128/27" onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="peSubnet" class="form-label">Private Endpoint subnet</label>
+                                    <input type="text" id="peSubnet" placeholder="10.0.0.160/28"
+                                        value="10.0.0.160/28" onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="mgmtSubnet" class="form-label">Management subnet</label>
+                                    <input type="text" id="mgmtSubnet" placeholder="10.0.0.176/28"
+                                        value="10.0.0.176/28" onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="sharedSvcSubnet" class="form-label">Shared services subnet</label>
+                                    <input type="text" id="sharedSvcSubnet" placeholder="10.0.0.192/28"
+                                        value="10.0.0.192/28" onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="appGwSubnet" class="form-label">Application Gateway subnet</label>
+                                    <input type="text" id="appGwSubnet" placeholder="10.0.0.224/27"
+                                        value="10.0.0.224/27" onChange="updateBicep()" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resource Names -->
+                <div class="config-card" id="resourceNames">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseNames" aria-expanded="true">
+                        <i class="bi bi-card-text section-icon"></i>
+                        <h5>Resource Names</h5>
+                        <i class="bi bi-chevron-down collapse-indicator"></i>
+                    </div>
+                    <div class="collapse show" id="collapseNames">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="hubVnet" class="form-label">Hub virtual network name</label>
+                                    <input type="text" id="hubVnet" placeholder="vnet-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="peSubnetName" class="form-label">Private Endpoint subnet name</label>
+                                    <input type="text" id="peSubnetName" placeholder="snet-pe-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="mgmtSubnetName" class="form-label">Management subnet name</label>
+                                    <input type="text" id="mgmtSubnetName" placeholder="snet-management-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="sharedSvcSubnetName" class="form-label">Shared Services subnet name</label>
+                                    <input type="text" id="sharedSvcSubnetName" placeholder="snet-sharedservices-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bastion -->
+                <div class="config-card" id="bastion">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseBastion" aria-expanded="true">
+                        <i class="bi bi-shield-lock section-icon"></i>
+                        <h5>Azure Bastion Service</h5>
+                        <i class="bi bi-chevron-down collapse-indicator"></i>
+                    </div>
+                    <div class="collapse show" id="collapseBastion">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="bastionServiceName" class="form-label">Bastion service name</label>
+                                    <input type="text" id="bastionServiceName" placeholder="bastion-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="bastionPublicIP" class="form-label">Bastion public IP name</label>
+                                    <input type="text" id="bastionPublicIP" placeholder="publicip-bastion-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="bastionSKU" class="form-label">Bastion SKU</label>
+                                    <select id="bastionSKU" onChange="updateBicep()" class="form-select">
+                                        <option value="Basic">Basic</option>
+                                        <option value="Standard" selected>Standard</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Firewall -->
+                <div class="config-card" id="firewall">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseFirewall" aria-expanded="true">
+                        <i class="bi bi-fire section-icon"></i>
+                        <h5>Azure Firewall</h5>
+                        <i class="bi bi-chevron-down collapse-indicator"></i>
+                    </div>
+                    <div class="collapse show" id="collapseFirewall">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="azureFirewall" class="form-label">Firewall name</label>
+                                    <input type="text" id="azureFirewall" placeholder="firewall-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="azureFirewallPublicIP" class="form-label">Firewall public IP name</label>
+                                    <input type="text" id="azureFirewallPublicIP" placeholder="publicip-firewall-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="azureFirewallPolicy" class="form-label">Firewall policy name</label>
+                                    <input type="text" id="azureFirewallPolicy" placeholder="fwpolicy-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Application Gateway -->
+                <div class="config-card" id="appGw">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseAppGw" aria-expanded="true">
+                        <i class="bi bi-globe section-icon"></i>
+                        <h5>Azure Application Gateway (WAF)</h5>
+                        <i class="bi bi-chevron-down collapse-indicator"></i>
+                    </div>
+                    <div class="collapse show" id="collapseAppGw">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="appGwName" class="form-label">Application Gateway name</label>
+                                    <input type="text" id="appGwName" placeholder="agw-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="appGwSubnetName" class="form-label">App Gateway subnet name</label>
+                                    <input type="text" id="appGwSubnetName" placeholder="snet-agw-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="appGwPublicIP" class="form-label">App Gateway public IP name</label>
+                                    <input type="text" id="appGwPublicIP" placeholder="publicip-agw-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="wafPolicy" class="form-label">WAF policy name</label>
+                                    <input type="text" id="wafPolicy" placeholder="wafpolicy-agw-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Log Analytics -->
+                <div class="config-card" id="logAnalytics">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseLAW" aria-expanded="true">
+                        <i class="bi bi-graph-up section-icon"></i>
+                        <h5>Log Analytics Workspace</h5>
+                        <i class="bi bi-chevron-down collapse-indicator"></i>
+                    </div>
+                    <div class="collapse show" id="collapseLAW">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label for="lawName" class="form-label">Workspace name</label>
+                                    <input type="text" id="lawName" placeholder="law-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="lawRetentionDays" class="form-label">Retention (days)</label>
+                                    <input type="number" id="lawRetentionDays" placeholder="30" value="30"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DDoS -->
+                <div class="config-card" id="ddos">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseDDoS" aria-expanded="true">
+                        <i class="bi bi-shield-check section-icon"></i>
+                        <h5>DDoS Protection Plan</h5>
+                        <i class="bi bi-chevron-down collapse-indicator"></i>
+                    </div>
+                    <div class="collapse show" id="collapseDDoS">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label for="ddosPlan" class="form-label">DDoS protection plan name</label>
+                                    <input type="text" id="ddosPlan" placeholder="ddosplan-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Enable DDoS Plan</label>
+                                    <div class="d-flex gap-3 mt-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="ddosPlanEnabled"
+                                                id="ddosEnabled" value="true" checked onChange="updateBicep()">
+                                            <label class="form-check-label" for="ddosEnabled">Enabled</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="ddosPlanEnabled"
+                                                id="ddosDisabled" value="false" onChange="updateBicep()">
+                                            <label class="form-check-label" for="ddosDisabled">Disabled</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recovery Service Vault -->
+                <div class="config-card" id="rsv">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseRSV" aria-expanded="true">
+                        <i class="bi bi-safe section-icon"></i>
+                        <h5>Recovery Service Vault</h5>
+                        <i class="bi bi-chevron-down collapse-indicator"></i>
+                    </div>
+                    <div class="collapse show" id="collapseRSV">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label for="recoveryServiceVault" class="form-label">Recovery Service Vault name</label>
+                                    <input type="text" id="recoveryServiceVault" placeholder="rsv-cust-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Managed Identity -->
+                <div class="config-card" id="identity">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseIdentity" aria-expanded="true">
+                        <i class="bi bi-person-badge section-icon"></i>
+                        <h5>Managed Identity</h5>
+                        <i class="bi bi-chevron-down collapse-indicator"></i>
+                    </div>
+                    <div class="collapse show" id="collapseIdentity">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label for="managedIdentity" class="form-label">Managed Identity name</label>
+                                    <input type="text" id="managedIdentity" placeholder="mi-kvaccess-cust-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                    <div class="form-hint">Used for Key Vault access</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Vault -->
+                <div class="config-card" id="keyvault">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseKV" aria-expanded="true">
+                        <i class="bi bi-key section-icon"></i>
+                        <h5>Key Vault</h5>
+                        <i class="bi bi-chevron-down collapse-indicator"></i>
+                    </div>
+                    <div class="collapse show" id="collapseKV">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <label for="keyVaultName" class="form-label">Key Vault name</label>
+                                    <input type="text" id="keyVaultName" placeholder="kv-cust-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="keyVaultTier" class="form-label">Key Vault tier</label>
+                                    <select id="keyVaultTier" onChange="updateBicep()" class="form-select">
+                                        <option value="premium" selected>Premium</option>
+                                        <option value="standard">Standard</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VNet Gateway -->
+                <div class="config-card" id="vpnGw">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseVPNGW" aria-expanded="true">
+                        <i class="bi bi-router section-icon"></i>
+                        <h5>VNet Gateway</h5>
+                        <i class="bi bi-chevron-down collapse-indicator"></i>
+                    </div>
+                    <div class="collapse show" id="collapseVPNGW">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="vpnGatewayName" class="form-label">VNet Gateway name</label>
+                                    <input type="text" id="vpnGatewayName" placeholder="vgw-cust-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="vpnGatewayIP" class="form-label">Gateway public IP</label>
+                                    <input type="text" id="vpnGatewayIP" placeholder="publicip-vgw-cust-hub-qc-01"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="vpnGatewayTier" class="form-label">Gateway tier</label>
+                                    <select id="vpnGatewayTier" onChange="updateBicep()" class="form-select">
+                                        <option value="VpnGw2AZ" selected>VpnGw2AZ</option>
+                                        <option value="VpnGw1AZ">VpnGw1AZ</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Jump Server -->
+                <div class="config-card" id="jumpServer">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseJump" aria-expanded="true">
+                        <i class="bi bi-pc-display section-icon"></i>
+                        <h5>Jump Server</h5>
+                        <i class="bi bi-chevron-down collapse-indicator"></i>
+                    </div>
+                    <div class="collapse show" id="collapseJump">
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="jumpServerPrefix" class="form-label">VM name prefix</label>
+                                    <input type="text" id="jumpServerPrefix" placeholder="winvm" value="winvm"
+                                        onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="jumpServerSize" class="form-label">VM size</label>
+                                    <input type="text" id="jumpServerSize" placeholder="Standard_D2s_v3"
+                                        value="Standard_D2s_v3" onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="adminUser" class="form-label">Admin username</label>
+                                    <input type="text" id="adminUser" onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="adminPassword" class="form-label">Admin password</label>
+                                    <input type="password" id="adminPassword" onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="vmNSGName" class="form-label">NSG name (Jump server subnet)</label>
+                                    <input type="text" id="vmNSGName" onChange="updateBicep()" class="form-control">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="vmRouteTableName" class="form-label">Route table name (Jump server)</label>
+                                    <input type="text" id="vmRouteTableName" onChange="updateBicep()" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tags -->
+                <div id="tagValues" value=""></div>
+                <div id="availabilityZones" value=""></div>
+
+                <div class="config-card" id="tags">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseTags" aria-expanded="true">
+                        <i class="bi bi-tags section-icon"></i>
+                        <h5>Resource Tags</h5>
+                        <i class="bi bi-chevron-down collapse-indicator"></i>
+                    </div>
+                    <div class="collapse show" id="collapseTags">
+                        <div class="card-body">
+                            <table id="myTable" class="table table-sm tags-table order-list mb-3">
+                                <thead>
+                                    <tr>
+                                        <th>Tag Name</th>
+                                        <th>Tag Value</th>
+                                        <th style="width:80px"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="text" name="key1" /></td>
+                                        <td><input type="text" name="value1" /></td>
+                                        <td>
+                                            <button class="btn btn-outline-danger btn-sm btn-danger-sm ibtnDel">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <button id="addrow" class="btn btn-outline-azure btn-sm">
+                                <i class="bi bi-plus-circle me-1"></i> Add Tag
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    $(document).ready(function () {
+                        var counter = 0;
+                        $("#addrow").on("click", function () {
+                            counter = $('#myTable tr').length - 1;
+                            var newRow = $("<tr>");
+                            var cols = "";
+                            cols += '<td><input type="text" name="key' + counter + '"/></td>';
+                            cols += '<td><input type="text" name="value' + counter + '"/></td>';
+                            cols += '<td><button class="btn btn-outline-danger btn-sm btn-danger-sm ibtnDel"><i class="bi bi-trash"></i></button></td>';
+                            newRow.append(cols);
+                            if (counter == 5)
+                                $('#addrow').attr('disabled', true).html("<i class='bi bi-x-circle me-1'></i> Limit reached");
+                            $("table.order-list tbody").append(newRow);
+                            counter++;
+                        });
+
+                        $("table.order-list").on("change", 'input[name^="value"]', function (event) {
+                            calculateTags();
+                        });
+
+                        $("table.order-list").on("click", ".ibtnDel", function (event) {
+                            $(this).closest("tr").remove();
+                            calculateTags();
+                            counter -= 1;
+                            $('#addrow').attr('disabled', false).html("<i class='bi bi-plus-circle me-1'></i> Add Tag");
+                        });
+                    });
+
+                    function calculateTags() {
+                        const keys = [];
+                        const vals = [];
+                        $("table.order-list").find('input[name^="key"]').each(function () {
+                            keys.push($(this).val());
+                        });
+                        $("table.order-list").find('input[name^="value"]').each(function () {
+                            vals.push($(this).val());
+                        });
+
+                        var tagValues = "param tagValues = {" + "\r\n";
+                        keys.forEach((tagName, index) => {
+                            const tagValue = vals[index];
+                            console.log(tagName, tagValue);
+                            tagValues += "\t'" + tagName + "': '" + tagValue + "'" + "\r\n";
+                        });
+
+                        tagValues += "}";
+                        document.getElementById("tagValues").value = tagValues;
+                        updateBicep();
+                    }
+                </script>
+
+                <!-- Availability Zones -->
+                <div class="config-card" id="zones">
+                    <div class="card-header" data-bs-toggle="collapse" data-bs-target="#collapseZones" aria-expanded="true">
+                        <i class="bi bi-geo-alt section-icon"></i>
+                        <h5>Availability Zones</h5>
+                        <i class="bi bi-chevron-down collapse-indicator"></i>
+                    </div>
+                    <div class="collapse show" id="collapseZones">
+                        <div class="card-body">
+                            <div class="zone-checks">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="zone1"
+                                        name="availabilityZones" value="1" checked onChange="getCheckboxValues()">
+                                    <label class="form-check-label" for="zone1">Zone 1</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="zone2"
+                                        name="availabilityZones" value="2" checked onChange="getCheckboxValues()">
+                                    <label class="form-check-label" for="zone2">Zone 2</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="zone3"
+                                        name="availabilityZones" value="3" checked onChange="getCheckboxValues()">
+                                    <label class="form-check-label" for="zone3">Zone 3</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function getCheckboxValues() {
+                        var checkBoxVals = [];
+                        $("input:checkbox[name=availabilityZones]:checked").each(function () {
+                            if ('1' === $(this).val()) checkBoxVals.push(1);
+                            if ('2' === $(this).val()) checkBoxVals.push(2);
+                            if ('3' === $(this).val()) checkBoxVals.push(3);
+                        });
+                        console.log("param availabilityZones = [" + checkBoxVals + "]");
+                        document.getElementById("availabilityZones").value = "param availabilityZones = [" + checkBoxVals + "]";
+                        updateBicep();
+                    }
+                </script>
+
+                <!-- Output Panel -->
+                <div class="config-card" id="output">
+                    <div class="card-header">
+                        <i class="bi bi-file-earmark-code section-icon"></i>
+                        <h5>Generated Bicep Parameter File</h5>
+                    </div>
+                    <div class="output-panel">
+                        <div class="output-header">
+                            <span><i class="bi bi-filetype-raw me-1"></i> main.bicepparam</span>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-light" onclick="copyToClipboard()" title="Copy to clipboard">
+                                    <i class="bi bi-clipboard me-1"></i> Copy
+                                </button>
+                                <button class="btn btn-sm btn-outline-light" onclick="downloadBicep()" title="Download file">
+                                    <i class="bi bi-download me-1"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                        <textarea id="bicepTextArea" rows="35"></textarea>
+                    </div>
+                </div>
+
+            </div><!-- /col-lg-9 -->
+        </div><!-- /row -->
+    </div><!-- /container -->
+
+    <!-- Copy Toast -->
+    <div class="copy-toast" id="copyToast"><i class="bi bi-check-circle me-1"></i> Copied to clipboard!</div>
+
+    <script>
+        /* ---- Copy / Download helpers ---- */
+        function copyToClipboard() {
+            var text = document.getElementById('bicepTextArea').value;
+            navigator.clipboard.writeText(text).then(function () {
+                var toast = document.getElementById('copyToast');
+                toast.classList.add('show');
+                setTimeout(function () { toast.classList.remove('show'); }, 2000);
+            });
+        }
+
+        function downloadBicep() {
+            var text = document.getElementById('bicepTextArea').value;
+            var blob = new Blob([text], { type: 'text/plain' });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'main.bicepparam';
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        /* ---- Sidebar active state on scroll ---- */
+        $(window).on('scroll', function () {
+            var scrollPos = $(document).scrollTop() + 100;
+            $('.sidebar-nav .nav-link').each(function () {
+                var target = $($(this).attr('href'));
+                if (target.length && target.offset().top <= scrollPos && target.offset().top + target.outerHeight() > scrollPos) {
+                    $('.sidebar-nav .nav-link').removeClass('active');
+                    $(this).addClass('active');
+                }
+            });
+        });
+
+        /* ---- Core logic (preserved) ---- */
+        function updateVNETRange() {
+            var addressPrefix = document.getElementById("hubVnetAddressSpace").value;
+            const ipArray = addressPrefix.split(".", 3);
+            var firstThreeParts = ipArray[0] + "." + ipArray[1] + "." + ipArray[2] + ".";
+            document.getElementById("firewallSubnet").value = firstThreeParts + "0/26";
+            document.getElementById("bastionSubnet").value = firstThreeParts + "64/26";
+            document.getElementById("vpnGatewaySubnet").value = firstThreeParts + "128/27";
+            document.getElementById("peSubnet").value = firstThreeParts + "160/28";
+            document.getElementById("mgmtSubnet").value = firstThreeParts + "176/28";
+            document.getElementById("sharedSvcSubnet").value = firstThreeParts + "192/28";
+            document.getElementById("appGwSubnet").value = firstThreeParts + "224/27";
+            updateBicep();
+        }
+
+        function updateValues() {
+            document.getElementById("hubBackupRG").value = createString('rg-backup');
+            document.getElementById("hubManagementRG").value = createString('rg-management');
+            document.getElementById("hubMonitoringRG").value = createString('rg-monitoring');
+            document.getElementById("hubNetworkRG").value = createString('rg-network');
+            document.getElementById("bastionServiceName").value = createString('bastion');
+            document.getElementById("hubVnet").value = createString('vnet');
+            document.getElementById("bastionPublicIP").value = createString('publicip-bastion');
+            document.getElementById("appGwSubnetName").value = createString('snet-agw');
+            document.getElementById("appGwName").value = createString('agw');
+            document.getElementById("appGwPublicIP").value = createString('publicip-agw');
+            document.getElementById("wafPolicy").value = createString('wafpolicy-agw');
+            document.getElementById("mgmtSubnetName").value = createString('snet-management');
+            document.getElementById("sharedSvcSubnetName").value = createString('snet-sharedservices');
+            document.getElementById("peSubnetName").value = createString('snet-pe');
+            document.getElementById("azureFirewall").value = createString('firewall');
+            document.getElementById("azureFirewallPublicIP").value = createString('publicip-firewall');
+            document.getElementById("azureFirewallPolicy").value = createString('fwpolicy');
+            document.getElementById("lawName").value = createString('law');
+            document.getElementById("ddosPlan").value = createString('ddosplan');
+            document.getElementById("vmNSGName").value = createString('nsg-jumpserver');
+            document.getElementById("vmRouteTableName").value = createString('rt-jumpserver');
+            document.getElementById("recoveryServiceVault").value = createString('vault');
+            document.getElementById("managedIdentity").value = createString('mi-kvaccess');
+            document.getElementById("keyVaultName").value = createString('kv');
+            document.getElementById("vpnGatewayName").value = createString('vgw');
+            document.getElementById("vpnGatewayIP").value = createString('publicip-vgw');
+            updateBicep();
+        }
+
+        function createString(resourceType) {
+            var customerPrefixVal = document.getElementById("customerPrefix").value;
+            var locationPrefixVal = document.getElementById("locationPrefix").value;
+            var envPrefixVal = document.getElementById("envPrefix").value;
+
+            if (customerPrefixVal == null || customerPrefixVal == "") {
+                customerPrefixVal = "-";
+            } else {
+                customerPrefixVal = "-" + customerPrefixVal + "-";
+            }
+
+            if (locationPrefixVal == null || locationPrefixVal == "") {
+                locationPrefixVal = "-";
+            } else {
+                locationPrefixVal = "-" + locationPrefixVal + "-";
+            }
+
+            return resourceType + customerPrefixVal + envPrefixVal + locationPrefixVal + "01";
+        }
+
+        function getBicepString(string1, var2) {
+            return "param " + string1 + " = '" + var2 + "'\r\n";
+        }
+
+        function getBicepNumber(string1, var2) {
+            return "param " + string1 + " = " + var2 + "\r\n";
+        }
+
+        function getBicepBool(string1, var2) {
+            return "param " + string1 + " = " + var2 + "\r\n";
+        }
+
+        function updateBicep() {
+            var hubBackupRG = document.getElementById("hubBackupRG").value;
+            var hubManagementRG = document.getElementById("hubManagementRG").value;
+            var hubMonitoringRG = document.getElementById("hubMonitoringRG").value;
+            var hubNetworkRG = document.getElementById("hubNetworkRG").value;
+
+            var hubVnetAddressSpace = document.getElementById("hubVnetAddressSpace").value;
+            var firewallSubnet = document.getElementById("firewallSubnet").value;
+            var bastionSubnet = document.getElementById("bastionSubnet").value;
+            var vpnGatewaySubnet = document.getElementById("vpnGatewaySubnet").value;
+            var peSubnet = document.getElementById("peSubnet").value;
+            var mgmtSubnet = document.getElementById("mgmtSubnet").value;
+            var sharedSvcSubnet = document.getElementById("sharedSvcSubnet").value;
+            var appGwSubnet = document.getElementById("appGwSubnet").value;
+
+            var vnetName = document.getElementById("hubVnet").value;
+            var firewallName = document.getElementById("azureFirewall").value;
+            var firewallPublicIPName = document.getElementById("azureFirewallPublicIP").value;
+            var azureFirewallPolicy = document.getElementById("azureFirewallPolicy").value;
+
+            var bastionServiceName = document.getElementById("bastionServiceName").value;
+            var bastionPublicIP = document.getElementById("bastionPublicIP").value;
+            var bastionSKU = document.getElementById("bastionSKU").value;
+            var peSubnetName = document.getElementById("peSubnetName").value;
+            var mgmtSubnetName = document.getElementById("mgmtSubnetName").value;
+            var sharedSvcSubnetName = document.getElementById("sharedSvcSubnetName").value;
+
+            var lawRetentionDays = document.getElementById("lawRetentionDays").value;
+            var lawName = document.getElementById("lawName").value;
+            var ddosPlan = document.getElementById("ddosPlan").value;
+            var ddosPlanEnabled = document.querySelector('input[name="ddosPlanEnabled"]:checked').value;
+
+            var appGwSubnetName = document.getElementById("appGwSubnetName").value;
+            var appGwName = document.getElementById("appGwName").value;
+            var appGwPublicIP = document.getElementById("appGwPublicIP").value;
+            var wafPolicy = document.getElementById("wafPolicy").value;
+
+            var recoveryServiceVault = document.getElementById("recoveryServiceVault").value;
+            var managedIdentity = document.getElementById("managedIdentity").value;
+
+            var keyVaultName = document.getElementById("keyVaultName").value;
+            var keyVaultTier = document.getElementById("keyVaultTier").value;
+
+            var vpnGatewayName = document.getElementById("vpnGatewayName").value;
+            var vpnGatewayIP = document.getElementById("vpnGatewayIP").value;
+            var vpnGatewayTier = document.getElementById("vpnGatewayTier").value;
+
+            var bicepTextArea = document.getElementById('bicepTextArea');
+
+            var jumpServerPrefix = document.getElementById("jumpServerPrefix").value;
+            var jumpServerSize = document.getElementById("jumpServerSize").value;
+            var adminUser = document.getElementById("adminUser").value;
+            var adminPassword = document.getElementById("adminPassword").value;
+            var vmNSGName = document.getElementById("vmNSGName").value;
+            var vmRouteTableName = document.getElementById("vmRouteTableName").value;
+            var tagValues = document.getElementById("tagValues").value;
+            if (tagValues == null) tagValues = "";
+            var availabilityZones = document.getElementById("availabilityZones").value;
+            if (availabilityZones == null)
+                availabilityZones = "param availabilityZones = [1,2,3]";
+
+            console.log(tagValues);
+
+            bicepTextArea.value =
+                "using './main.bicep'" + "\r\n" +
+                getBicepString("backupRGName", hubBackupRG) +
+                getBicepString("managementRGName", hubManagementRG) +
+                getBicepString("monitoringRGName", hubMonitoringRG) +
+                getBicepString("networkRGName", hubNetworkRG) +
+                getBicepString("vnetAddressPrefix", hubVnetAddressSpace) +
+                getBicepString("fwSubnetAddressPrefix", firewallSubnet) +
+                getBicepString("bastionSubnetAddressPrefix", bastionSubnet) +
+                getBicepString("vpnSubnetAddressPrefix", vpnGatewaySubnet) +
+                getBicepString("peSubnetAddressPrefix", peSubnet) +
+                getBicepString("managementSubnetAddressPrefix", mgmtSubnet) +
+                getBicepString("sharedServicesSubnetAddressPrefix", sharedSvcSubnet) +
+                getBicepString("appGwSubnetAddressPrefix", appGwSubnet) +
+                getBicepString("vnetName", vnetName) +
+                getBicepString("firewallName", firewallName) +
+                getBicepString("firewallPublicIPName", firewallPublicIPName) +
+                getBicepString("firewallPolicyName", azureFirewallPolicy) +
+                getBicepString("bastionName", bastionServiceName) +
+                getBicepString("bastionPublicIPName", bastionPublicIP) +
+                getBicepString("bastionSku", bastionSKU) +
+                getBicepString("peSubnetName", peSubnetName) +
+                getBicepString("managementSubnetName", mgmtSubnetName) +
+                getBicepString("sharedServicesSubnetName", sharedSvcSubnetName) +
+                getBicepNumber("logAnalyticsRetentionInDays", lawRetentionDays) +
+                getBicepString("logAnalyticsWorkspaceName", lawName) +
+                getBicepString("logAnalyticsSku", "PerGB2018") +
+                getBicepString("ddosProtectionPlanName", ddosPlan) +
+                getBicepBool("ddosProtectionPlanEnabled", ddosPlanEnabled) +
+                getBicepString("appGwSubnetName", appGwSubnetName) +
+                getBicepString("applicationGatewayName", appGwName) +
+                getBicepString("applicationGatewayPublicIPName", appGwPublicIP) +
+                getBicepString("appGatewayWAFPolicyName", wafPolicy) +
+                getBicepString("recoveryServiceVaultName", recoveryServiceVault) +
+                getBicepString("managedIdentityName", managedIdentity) +
+                getBicepString("keyVaultName", keyVaultName) +
+                getBicepString("keyVaultSKU", keyVaultTier) +
+                getBicepString("vpnGatewayName", vpnGatewayName) +
+                getBicepString("vpnGatewayPublicIP", vpnGatewayIP) +
+                getBicepString("vpnGatewayTier", vpnGatewayTier) +
+                getBicepString("vmName", jumpServerPrefix) +
+                getBicepString("vmSize", jumpServerSize) +
+                getBicepString("vmNSGName", vmNSGName) +
+                getBicepString("vmRouteTableName", vmRouteTableName) +
+                getBicepString("adminUsername", adminUser) +
+                getBicepString("adminPassword", adminPassword) +
+                tagValues + "\r\n" +
+                availabilityZones +
+                "";
+        }
+    </script>
+
+    <!-- Footer -->
+    <footer class="text-center text-muted py-4 mt-3" style="font-size:0.85rem;">
+        Azure Landing Zone Builder &mdash; Bicep Parameter File Generator
+    </footer>
 </body>
 
 </html>
